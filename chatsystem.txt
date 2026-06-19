@@ -1,0 +1,180 @@
+create database chatsystem;
+create table chatsystem.users
+(
+    userid int primary key unique,
+    username varchar(255) NOT NULL,
+    statusmessage varchar(255),
+    lastseen varchar(255),
+    email varchar(255) UNIQUE NOT NULL,
+    age int,
+    contact varchar(255) UNIQUE NOT NULL
+);
+INSERT INTO chatsystem.users (userid, username, statusmessage, lastseen, email, age, contact)
+VALUES
+(1, 'Mahrosh', 'Feeling dizzy', '2024-04-28 10:30', 'mh@gmail.com', 10, 98765),
+(2, 'Haider', 'Feeling blessed', '2002-07-14 06:09', 'haa@gmail.com', 16,  43210),
+(3, 'Asfar', 'Feeling blissful', '2019-09-05 12:40', 'er5@gmail.com', 29, 54862),
+(4, 'Sheza', 'Feeling relaxed', '2023-07-06 10:12', 'lak@gmail.com', 45, 73158);
+SELECT * FROM chatsystem.users;
+
+create table chatsystem.groupchat 
+(
+    groupid int primary key unique,
+    groupname varchar(255) NOT NULL,
+    grouppermission varchar(255),
+    admins int NOT NULL,
+    creationdate varchar(255),
+    membercount int,
+    chatlock varchar(255),
+    foreign key(admins) references users(userid)
+);
+INSERT INTO chatsystem.groupchat (groupid, groupname, grouppermission, admins, creationdate, membercount, chatlock)
+VALUES
+(1, 'Besties', 'private', 1, '2012-12-01', 5, 'locked'),
+(2, 'PAFLA', 'public', 2, '2022-05-02', 6994, 'not locked'),
+(3, 'Forever', 'private', 3, '2018-06-11', 19, 'locked'),
+(4, 'PSL', 'public', 4, '2002-05-07', 894, 'not locked');
+SELECT * FROM chatsystem.groupchat;
+
+create table chatsystem.messages
+(
+    messageid int primary key unique,
+    receiver int NOT NULL,
+    sender int NOT NULL,
+    readstatus varchar(255) DEFAULT 'unread',
+    descriptions varchar(255),
+    timestamps varchar(255),
+    attachmentid int,
+    imagetypes varchar(255),
+    foreign key(receiver) references users(userid),
+    foreign key(sender) references users(userid)
+);
+
+create table chatsystem.chat
+(
+    chatid int primary key unique,
+    participantname varchar(255) NOT NULL,
+    disappearingmessages varchar(255),
+    calls varchar(255)
+);
+
+create table chatsystem.notifications
+(
+    notificationid int primary key unique,
+    userid int NOT NULL,
+    notificationtype varchar(255) NOT NULL,
+    content varchar(255),
+    timestamps TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    foreign key(userid) references users(userid)
+);
+
+create table chatsystem.settings
+(
+    settingsid int primary key unique,
+    chathistory varchar(255),
+    storageanddata varchar(255),
+    notificationsettings varchar(255),
+    blockedcontacts varchar(255),
+    theme varchar(255),
+    userid int NOT NULL,
+    helpcenter varchar(255),
+    accountinformation varchar(255),
+    foreign key(userid) references users(userid)
+);
+
+create table chatsystem.attachment
+(
+    attachmentid int primary key unique,
+    filename varchar(255),
+    filesize varchar(255),
+    content varchar(255),
+    messageid int,
+    filetype varchar(255),
+    foreign key(messageid) references messages(messageid)
+);
+
+UPDATE chatsystem.users
+SET contact = '0334509'
+WHERE userid = 3;
+SELECT * FROM chatsystem.users;
+
+ALTER TABLE chatsystem.users
+ADD Passwords varchar(255)
+AFTER contact;
+SELECT * FROM chatsystem.users;
+
+SELECT DISTINCT username FROM users;
+
+SELECT * FROM chatsystem.users
+WHERE username LIKE 'A%';
+
+SELECT * FROM chatsystem.users
+WHERE username NOT LIKE 'A%';
+
+SELECT * FROM chatsystem.users
+WHERE userid BETWEEN 1 AND 3;
+
+SELECT * FROM chatsystem.users
+WHERE userid NOT BETWEEN 3 AND 4;
+
+SELECT * FROM chatsystem.users
+WHERE age>=16 AND age<=45;
+
+SELECT * FROM chatsystem.users
+WHERE age>=16 OR userid>=2;
+
+SELECT * FROM chatsystem.users
+ORDER BY userid;
+
+SELECT * FROM chatsystem.users
+ORDER BY userid DESC;
+
+SELECT * FROM chatsystem.users
+WHERE age IN(10,29);
+
+SELECT * FROM chatsystem.users
+WHERE age NOT IN(10,29);
+
+SELECT username 
+FROM users
+WHERE EXISTS (SELECT userid FROM users WHERE username IN ("Mahrosh"));
+
+SELECT MIN(creationdate) FROM chatsystem.groupchat;
+
+SELECT MAX(creationdate) FROM chatsystem.groupchat;
+
+SELECT COUNT(*) FROM chatsystem.users;
+
+SELECT SUM(age) FROM chatsystem.users;
+
+SELECT AVG(age) FROM chatsystem.users;
+
+SELECT * FROM chatsystem.users
+WHERE userid IN (SELECT userid FROM chatsystem.users WHERE statusmessage = 'feeling dizzy');
+
+SELECT u.userid, u.username, g.groupname, g.grouppermission, g.creationdate
+FROM chatsystem.users u
+INNER JOIN chatsystem.groupchat g 
+ON u.userid = g.admins
+WHERE g.grouppermission = 'private'
+GROUP BY u.userid, u.username, g.groupname, g.grouppermission, g.creationdate;
+
+SELECT u.userid, u.username, g.groupname, g.grouppermission, g.creationdate
+FROM chatsystem.users u
+LEFT JOIN chatsystem.groupchat g 
+ON u.userid = g.admins
+WHERE g.grouppermission = 'private'
+GROUP BY  u.userid, u.username, g.groupname, g.grouppermission, g.creationdate;
+
+SELECT u.userid, u.username, g.groupname, g.grouppermission, g.creationdate
+FROM chatsystem.users u
+RIGHT JOIN chatsystem.groupchat g 
+ON u.userid = g.admins
+WHERE g.grouppermission = 'public'
+GROUP BY u.userid, u.username, g.groupname, g.grouppermission, g.creationdate;
+
+SELECT *
+FROM chatsystem.users u
+CROSS JOIN chatsystem.groupchat g;
+
+
